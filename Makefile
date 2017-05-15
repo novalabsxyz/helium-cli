@@ -2,7 +2,7 @@ PROJECT=atom
 WARN = -Wall -Wextra -pedantic
 LIB_CARBON=carbon/libcarbon.a
 
-CFLAGS = -g ${WARN} -std=c11 -I../carbon -D_BSD_SOURCE
+CFLAGS = -g ${WARN} -std=c11 -Icarbon -D_BSD_SOURCE
 
 OBJS =  src/connect.o \
 	src/sleep.o \
