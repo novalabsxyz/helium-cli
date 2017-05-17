@@ -1,8 +1,4 @@
 #include "util.h"
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 int
 cli_channel_create(struct carbon_ctx * ctx, struct options * options)
@@ -88,14 +84,12 @@ int
 cli_channel(struct carbon_ctx * ctx, struct options * options)
 {
     const char * arg_cmd = optparse_arg(&options->optparse);
-    for (struct cli_command * cmd = commands; cmd->name; cmd++)
+    cli_func     func    = cli_find(arg_cmd, commands);
+    if (NULL == func)
     {
-        if (strcmp(cmd->name, arg_cmd) == 0)
-        {
-            return cmd->func(ctx, options);
-        }
+        printf("No such command: %s\n", arg_cmd);
+        return -1;
     }
 
-    printf("Invalid command: %s\n", arg_cmd);
-    return -1;
+    return func(ctx, options);
 }

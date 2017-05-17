@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <inttypes.h>
 #include <poll.h>
+#include <stdio.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -84,7 +85,6 @@ int
 open_serial_port(const char * portname)
 {
     int fd;
-
     fd = open(portname, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
     if (fd < 0)
@@ -116,16 +116,37 @@ open_serial_port(const char * portname)
     return fd;
 }
 
-static int
-usage(const char * app, const char * error)
+static void
+usage(const char * app)
 {
-    if (error)
-    {
-        printf("%s: %s\n", app, error);
-        return -1;
-    }
-    printf("Usage\n");
-    return 0;
+    fprintf(
+        stderr,
+        "%s\n"
+        "\n"
+        "Usage: %s [OPTIONS] [cmd [arg [arg ...]]]\n"
+        "\nOptions:\n"
+        "  -h/--help      This help message.\n"
+        "  -p/--port      The (USB) device to talk to.\n"
+        "  -f/--file      The file to use for connect/sleep data or channel "
+        "send.\n"
+
+        "\nCommands:\n"
+        "  connect                   Get the atom to connect to the network\n"
+        "  connected                 Check if the atom is connected. Returns 0\n"
+        "                            if connected.\n"
+        "                            Use '-f' to specify quick connect data.\n"
+        "  sleep                     Disconnect from the network, saving quick\n"
+        "                            connect data. Use '-f' to specify quick connect\n"
+        "                            filename (default 'connection.dat').\n"
+        "  info                      Print information of the atom.\n"
+
+        "  channel create <name>     Create a channel with a given <name>.\n"
+        "                            Prints out the id of the created\n"
+        "                            channel.\n"
+        "  channel send <id> [text]  Sends the given [text] to the given\n"
+        "                            channel <id>. If [text] is not specified\n"
+        "                            '-f' is checked for a filename to send.\n",
+        app, app);
 }
 
 int(cli_connect)(struct carbon_ctx * ctx, struct options * options);
@@ -147,8 +168,10 @@ int
 main(int argc, char ** argv)
 {
     (void)argc;
-    int opt, longindex;
+    int fd     = -1;
+    int result = 0;
 
+    int                  opt, longindex;
     struct options       options;
     struct optparse_long longopts[] = {{"help", 'h', OPTPARSE_NONE},
                                        {"port", 'p', OPTPARSE_REQUIRED},
@@ -162,49 +185,49 @@ main(int argc, char ** argv)
         switch (opt)
         {
         case 'h':
-            return usage(argv[0], NULL);
+            usage(argv[0]);
+            ERR_NEXIT(0);
+            break;
         case 'p':
             options.port = options.optparse.optarg;
             break;
         case 'f':
             options.filename = options.optparse.optarg;
             break;
-        case 'c':
-            options.channel = options.optparse.optarg;
-            break;
         case '?':
-            return usage(argv[0], options.optparse.errmsg);
+            printf("%s", options.optparse.errmsg);
+            ERR_NEXIT(1);
+            break;
         }
     }
 
     char * arg_cmd = optparse_arg(&options.optparse);
     if (arg_cmd == NULL)
     {
-        return usage(argv[0], "Missing command");
+        ERR_EXIT(-1, "%s: Missing command\n", argv[0]);
     }
 
-    int fd = open_serial_port(options.port);
-    if (fd < 0)
+    ;
+    if ((fd = open_serial_port(options.port)) < 0)
     {
-        return fd;
+        ERR_NEXIT(-1);
     }
 
     struct carbon_ctx ctx;
     carbon_init(&ctx, (void *)(intptr_t)fd);
 
-    int result = -1;
-    for (struct cli_command * cmd = commands; cmd->name; cmd++)
+    cli_func func = cli_find(arg_cmd, commands);
+    if (NULL == func)
     {
-        if (strcmp(cmd->name, arg_cmd) == 0)
-        {
-            result = cmd->func(&ctx, &options);
-            goto exit;
-        }
+        ERR_EXIT(-1, "No such command: %s\n", arg_cmd);
     }
 
-    return usage(argv[0], "Invalid command");
+    result = func(&ctx, &options);
 
 exit:
-    close(fd);
+    if (fd >= 0)
+    {
+        close(fd);
+    }
     return result;
 }

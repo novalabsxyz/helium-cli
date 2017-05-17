@@ -1,7 +1,4 @@
 #include "util.h"
-#include <errno.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 int
 cli_sleep(struct carbon_ctx * ctx, struct options * options)
@@ -18,19 +15,5 @@ cli_sleep(struct carbon_ctx * ctx, struct options * options)
         return -1;
     }
 
-    int fd = open(outfile, O_CREAT | O_WRONLY);
-    if (fd == -1)
-    {
-        printf("Error opening output file: %s\n", strerror(errno));
-        return -1;
-    }
-
-    if (write(fd, &connection, sizeof(connection)) != sizeof(connection))
-    {
-        printf("Error writing connection data: %s\n", strerror(errno));
-        return -1;
-    }
-
-    close(fd);
-    return 0;
+    return save_file(outfile, (uint8_t *)&connection, sizeof(connection));
 }
