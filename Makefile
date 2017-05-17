@@ -8,7 +8,9 @@ OBJS =  src/connect.o \
 	src/sleep.o \
 	src/connected.o \
 	src/info.o \
-	src/send.o
+	src/channel.o \
+	src/util.o
+
 
 all: ${PROJECT}
 

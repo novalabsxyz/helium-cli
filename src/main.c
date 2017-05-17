@@ -1,44 +1,53 @@
-#include "carbon.h"
-#include <fcntl.h>
-#include <termios.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <poll.h>
+#include "util.h"
 #include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
-#include "options.h"
+#include <poll.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <unistd.h>
 
-bool carbon_serial_readable(void *param) {
+bool
+carbon_serial_readable(void * param)
+{
     struct pollfd pollfd = {
-        .fd = (int)(intptr_t)param,
-        .events = POLLIN,
+        .fd = (int)(intptr_t)param, .events = POLLIN,
     };
-    if (poll(&pollfd, 1, -1) == 1) {
+    if (poll(&pollfd, 1, -1) == 1)
+    {
         return pollfd.revents & POLLIN;
     }
     return false;
 }
 
-bool carbon_serial_getc(void *param, uint8_t *ch) {
+bool
+carbon_serial_getc(void * param, uint8_t * ch)
+{
     return read((int)(intptr_t)param, ch, 1) > 0;
 }
 
-bool carbon_serial_putc(void *param, uint8_t ch) {
+bool
+carbon_serial_putc(void * param, uint8_t ch)
+{
     return write((int)(intptr_t)param, &ch, 1) == 1;
 }
 
-void carbon_wait_us(void *param, uint32_t us) {
+void
+carbon_wait_us(void * param, uint32_t us)
+{
     (void)param;
     usleep(us);
 }
 
 
-int set_interface_attribs(int fd, int speed)
+int
+set_interface_attribs(int fd, int speed)
 {
     struct termios tty;
 
-    if (tcgetattr(fd, &tty) < 0) {
+    if (tcgetattr(fd, &tty) < 0)
+    {
         printf("Error from tcgetattr: %s\n", strerror(errno));
         return -1;
     }
@@ -46,49 +55,59 @@ int set_interface_attribs(int fd, int speed)
     cfsetospeed(&tty, (speed_t)speed);
     cfsetispeed(&tty, (speed_t)speed);
 
-    tty.c_cflag |= (CLOCAL | CREAD);    /* ignore modem controls */
+    tty.c_cflag |= (CLOCAL | CREAD); /* ignore modem controls */
     tty.c_cflag &= ~CSIZE;
-    tty.c_cflag |= CS8;         /* 8-bit characters */
-    tty.c_cflag &= ~PARENB;     /* no parity bit */
-    tty.c_cflag &= ~CSTOPB;     /* only need 1 stop bit */
-    tty.c_cflag &= ~CRTSCTS;    /* no hardware flowcontrol */
+    tty.c_cflag |= CS8;      /* 8-bit characters */
+    tty.c_cflag &= ~PARENB;  /* no parity bit */
+    tty.c_cflag &= ~CSTOPB;  /* only need 1 stop bit */
+    tty.c_cflag &= ~CRTSCTS; /* no hardware flowcontrol */
 
     /* setup for non-canonical mode */
-    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+    tty.c_iflag &=
+        ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
     tty.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
     tty.c_oflag &= ~OPOST;
 
     /* fetch bytes as they become available */
-    tty.c_cc[VMIN] = 1;
+    tty.c_cc[VMIN]  = 1;
     tty.c_cc[VTIME] = 1;
 
-    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+    if (tcsetattr(fd, TCSANOW, &tty) != 0)
+    {
         printf("Error from tcsetattr: %s\n", strerror(errno));
         return -1;
     }
     return 0;
 }
 
-int open_serial_port(const char *portname)
+int
+open_serial_port(const char * portname)
 {
     int fd;
 
     fd = open(portname, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
-    if (fd < 0) {
+    if (fd < 0)
+    {
         printf("Error opening %s: %s\n", portname, strerror(errno));
         return -1;
     }
 
-    if (ioctl(fd, TIOCEXCL) < 0) {
+    if (ioctl(fd, TIOCEXCL) < 0)
+    {
         printf("Error setting TIOCEXCL on %s - %s(%d).\n",
-               portname, strerror(errno), errno);
+               portname,
+               strerror(errno),
+               errno);
         return -1;
     }
 
-    if (fcntl(fd, F_SETFL, 0) < 0) {
+    if (fcntl(fd, F_SETFL, 0) < 0)
+    {
         printf("Error clearing O_NONBLOCK %s - %s(%d).\n",
-               portname, strerror(errno), errno);
+               portname,
+               strerror(errno),
+               errno);
         return -1;
     }
 
@@ -97,8 +116,11 @@ int open_serial_port(const char *portname)
     return fd;
 }
 
-static int usage(const char *app, const char *error) {
-    if (error) {
+static int
+usage(const char * app, const char * error)
+{
+    if (error)
+    {
         printf("%s: %s\n", app, error);
         return -1;
     }
@@ -106,39 +128,39 @@ static int usage(const char *app, const char *error) {
     return 0;
 }
 
-int (cli_connect)   (struct carbon_ctx *ctx, struct options *options);
-int (cli_connected) (struct carbon_ctx *ctx, struct options *options);
-int (cli_sleep)     (struct carbon_ctx *ctx, struct options *options);
-int (cli_info)      (struct carbon_ctx *ctx, struct options *options);
-int (cli_send)      (struct carbon_ctx *ctx, struct options *options);
+int(cli_connect)(struct carbon_ctx * ctx, struct options * options);
+int(cli_connected)(struct carbon_ctx * ctx, struct options * options);
+int(cli_sleep)(struct carbon_ctx * ctx, struct options * options);
+int(cli_info)(struct carbon_ctx * ctx, struct options * options);
+int(cli_channel)(struct carbon_ctx * ctx, struct options * options);
 
-struct cli_command {
-    const char *name;
-    int (*func)(struct carbon_ctx *ctx, struct options *options);
-} commands[] = {
-    { .name = "connect", .func = cli_connect},
-    { .name = "connected", .func = cli_connected},
-    { .name = "sleep", .func = cli_sleep},
-    { .name = "info", .func = cli_info},
-    { .name = "send", .func = cli_send},
-    { 0, 0},
+static struct cli_command commands[] = {
+    {.name = "connect", .func = cli_connect},
+    {.name = "connected", .func = cli_connected},
+    {.name = "sleep", .func = cli_sleep},
+    {.name = "info", .func = cli_info},
+    {.name = "channel", .func = cli_channel},
+    {0, 0},
 };
 
-int main(int argc, char **argv) {
+int
+main(int argc, char ** argv)
+{
     (void)argc;
     int opt, longindex;
 
-    struct options options;
-    struct optparse_long longopts[] = {
-        {"help", 'h', OPTPARSE_NONE},
-        {"port", 'p', OPTPARSE_REQUIRED},
-        {"file", 'f', OPTPARSE_REQUIRED},
-        {0, 0, 0}
-    };
+    struct options       options;
+    struct optparse_long longopts[] = {{"help", 'h', OPTPARSE_NONE},
+                                       {"port", 'p', OPTPARSE_REQUIRED},
+                                       {"file", 'f', OPTPARSE_REQUIRED},
+                                       {"channel", 'c', OPTPARSE_REQUIRED},
+                                       {0, 0, 0}};
 
     options_init(&options, argv);
-    while((opt = optparse_long(&options.optparse, longopts, &longindex)) != -1) {
-        switch(opt) {
+    while ((opt = optparse_long(&options.optparse, longopts, &longindex)) != -1)
+    {
+        switch (opt)
+        {
         case 'h':
             return usage(argv[0], NULL);
         case 'p':
@@ -147,18 +169,23 @@ int main(int argc, char **argv) {
         case 'f':
             options.filename = options.optparse.optarg;
             break;
+        case 'c':
+            options.channel = options.optparse.optarg;
+            break;
         case '?':
             return usage(argv[0], options.optparse.errmsg);
         }
     }
 
-    char *arg_cmd = optparse_arg(&options.optparse);
-    if (arg_cmd == NULL) {
+    char * arg_cmd = optparse_arg(&options.optparse);
+    if (arg_cmd == NULL)
+    {
         return usage(argv[0], "Missing command");
     }
 
     int fd = open_serial_port(options.port);
-    if (fd < 0) {
+    if (fd < 0)
+    {
         return fd;
     }
 
@@ -166,8 +193,10 @@ int main(int argc, char **argv) {
     carbon_init(&ctx, (void *)(intptr_t)fd);
 
     int result = -1;
-    for (struct cli_command *cmd = commands; cmd->name; cmd++) {
-        if (strcmp(cmd->name, arg_cmd) == 0) {
+    for (struct cli_command * cmd = commands; cmd->name; cmd++)
+    {
+        if (strcmp(cmd->name, arg_cmd) == 0)
+        {
             result = cmd->func(&ctx, &options);
             goto exit;
         }

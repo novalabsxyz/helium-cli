@@ -1,26 +1,14 @@
-#include "options.h"
-#include "carbon.h"
 #include <inttypes.h>
-
-static inline const char *str_info_status(enum carbon_info_status status) {
-    switch (status) {
-    case carbon_info_OK:
-        return NULL;
-    case carbon_info_ERR_COMMUNICATION:
-        return "Error communicating with Atom";
-    }
-
-    return NULL;
-}
+#include "util.h"
 
 int cli_info(struct carbon_ctx *ctx, struct options *options) {
     (void)options;
 
     struct res_info info;
-    enum carbon_info_status status = carbon_info(ctx, &info);
+    int status = carbon_info(ctx, &info);
 
-    if (status != carbon_info_OK) {
-        printf("%s\n", str_info_status(status));
+    if (status != carbon_status_OK) {
+        printf("%s\n", str_carbon_status(status));
         return -1;
     }
 
