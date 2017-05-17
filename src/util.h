@@ -14,7 +14,6 @@ struct options
     const char **   argv;
     const char *    port;
     const char *    filename;
-    const char *    channel;
 };
 
 static inline void
@@ -23,7 +22,6 @@ options_init(struct options * options, char ** argv)
     optparse_init(&options->optparse, argv);
     options->port     = DEFAULT_PORT;
     options->filename = 0;
-    options->channel  = "azure";
 }
 
 

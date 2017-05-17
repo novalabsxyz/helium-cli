@@ -12,8 +12,8 @@ cli_channel_create(struct carbon_ctx * ctx, struct options * options)
 
     uint8_t channel_id;
     int     status = carbon_channel_create(ctx,
-                                       options->channel,
-                                       strlen(options->channel),
+                                       arg_name,
+                                       strlen(arg_name),
                                        &channel_id);
 
     if (status != carbon_status_OK)
