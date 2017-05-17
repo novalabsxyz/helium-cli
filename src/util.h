@@ -26,15 +26,36 @@ options_init(struct options * options, char ** argv)
     options->channel  = "azure";
 }
 
+
+typedef int (*cli_func)(struct carbon_ctx * ctx, struct options * options);
+
 struct cli_command
 {
     const char * name;
-    int (*func)(struct carbon_ctx * ctx, struct options * options);
+    cli_func     func;
 };
+
+cli_func
+cli_find(const char * needle, struct cli_command * commands);
 
 const char *
 str_carbon_status(enum carbon_status status);
 int
 load_file(const char * filename, uint8_t * data, size_t len);
+int
+save_file(const char * filename, uint8_t * data, size_t len);
+
+#define ERR_NEXIT(e)                                                           \
+    {                                                                          \
+        result = e;                                                            \
+        goto exit;                                                             \
+    }
+
+#define ERR_EXIT(e, fmt, ...)                                                  \
+    {                                                                          \
+        result = e;                                                            \
+        printf(fmt, __VA_ARGS__);                                              \
+        goto exit;                                                             \
+    }
 
 #endif // CARBON_CLI_UTILS_H
