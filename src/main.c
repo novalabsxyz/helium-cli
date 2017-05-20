@@ -82,7 +82,7 @@ set_interface_attribs(int fd, int speed)
 }
 
 int
-open_serial_port(const char * portname)
+open_serial_port(const char * portname, enum carbon_baud baud)
 {
     int fd;
     fd = open(portname, O_RDWR | O_NOCTTY | O_NONBLOCK);
@@ -111,8 +111,31 @@ open_serial_port(const char * portname)
         return -1;
     }
 
-    /*baudrate 115200, 8 bits, no parity, 1 stop bit */
-    set_interface_attribs(fd, B115200);
+    int baud_rate = B9600;
+    switch (baud)
+    {
+    case carbon_baud_b9600:
+        baud_rate = B9600;
+        break;
+    case carbon_baud_b14400:
+        baud_rate = B14400;
+        break;
+    case carbon_baud_b19200:
+        baud_rate = B19200;
+        break;
+    case carbon_baud_b38400:
+        baud_rate = B38400;
+        break;
+    case carbon_baud_b57600:
+        baud_rate = B57600;
+        break;
+    case carbon_baud_b115200:
+        baud_rate = B115200;
+        break;
+    }
+
+    /* Set baud rate,  8 bits, no parity, 1 stop bit */
+    set_interface_attribs(fd, baud_rate);
     return fd;
 }
 
@@ -127,16 +150,18 @@ usage(const char * app)
         "\nOptions:\n"
         "  -h/--help      This help message.\n"
         "  -p/--port      The (USB) device to talk to.\n"
+        "  -b/--baud      The baud rate to use on the port (default 9600).\n"
         "  -f/--file      The file to use for connect/sleep data or channel "
         "send.\n"
 
         "\nCommands:\n"
         "  connect                   Get the atom to connect to the network\n"
-        "  connected                 Check if the atom is connected. Returns 0\n"
-        "                            if connected.\n"
         "                            Use '-f' to specify quick connect data.\n"
-        "  sleep                     Disconnect from the network, saving quick\n"
-        "                            connect data. Use '-f' to specify quick connect\n"
+        "  connected                 Check if the atom is connected.\n"
+        "                            Returns 0 if connected.\n"
+        "  sleep                     Disconnect from the network, saving\n"
+        "                            quick connect data.\n"
+        "                            Use '-f' to specify quick connect\n"
         "                            filename (default 'connection.dat').\n"
         "  info                      Print information of the atom.\n"
 
@@ -146,16 +171,19 @@ usage(const char * app)
         "  channel send <id> [text]  Sends the given [text] to the given\n"
         "                            channel <id>. If [text] is not specified\n"
         "                            '-f' is checked for a filename to send.\n",
-        app, app);
+        app,
+        app);
 }
 
 int(cli_connect)(struct carbon_ctx * ctx, struct options * options);
 int(cli_connected)(struct carbon_ctx * ctx, struct options * options);
 int(cli_sleep)(struct carbon_ctx * ctx, struct options * options);
 int(cli_info)(struct carbon_ctx * ctx, struct options * options);
+int(cli_baud)(struct carbon_ctx * ctx, struct options * options);
 int(cli_channel)(struct carbon_ctx * ctx, struct options * options);
 
 static struct cli_command commands[] = {
+    {.name = "baud", .func = cli_baud},
     {.name = "connect", .func = cli_connect},
     {.name = "connected", .func = cli_connected},
     {.name = "sleep", .func = cli_sleep},
@@ -175,6 +203,7 @@ main(int argc, char ** argv)
     struct options       options;
     struct optparse_long longopts[] = {{"help", 'h', OPTPARSE_NONE},
                                        {"port", 'p', OPTPARSE_REQUIRED},
+                                       {"baud", 'b', OPTPARSE_REQUIRED},
                                        {"file", 'f', OPTPARSE_REQUIRED},
                                        {"channel", 'c', OPTPARSE_REQUIRED},
                                        {0, 0, 0}};
@@ -191,11 +220,17 @@ main(int argc, char ** argv)
         case 'p':
             options.port = options.optparse.optarg;
             break;
+        case 'b':
+            if (baud_str(options.optparse.optarg, &options.baud) < 0)
+            {
+                ERR_EXIT(-1, "Invalid baud rate: %s\n", options.optparse.optarg);
+            }
+            break;
         case 'f':
             options.filename = options.optparse.optarg;
             break;
         case '?':
-            printf("%s", options.optparse.errmsg);
+            printf("%s\n", options.optparse.errmsg);
             ERR_NEXIT(1);
             break;
         }
@@ -208,7 +243,7 @@ main(int argc, char ** argv)
     }
 
     ;
-    if ((fd = open_serial_port(options.port)) < 0)
+    if ((fd = open_serial_port(options.port, options.baud)) < 0)
     {
         ERR_NEXIT(-1);
     }

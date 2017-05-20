@@ -10,10 +10,11 @@
 
 struct options
 {
-    struct optparse optparse;
-    const char **   argv;
-    const char *    port;
-    const char *    filename;
+    struct optparse  optparse;
+    const char **    argv;
+    const char *     port;
+    enum carbon_baud baud;
+    const char *     filename;
 };
 
 static inline void
@@ -21,9 +22,12 @@ options_init(struct options * options, char ** argv)
 {
     optparse_init(&options->optparse, argv);
     options->port     = DEFAULT_PORT;
+    options->baud     = carbon_baud_b9600;
     options->filename = 0;
 }
 
+int
+baud_str(const char * str, enum carbon_baud *baud);
 
 typedef int (*cli_func)(struct carbon_ctx * ctx, struct options * options);
 

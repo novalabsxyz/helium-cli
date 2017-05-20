@@ -18,6 +18,32 @@ cli_find(const char * needle, struct cli_command * commands)
     return NULL;
 }
 
+int
+baud_str(const char * str, enum carbon_baud *baud)
+{
+    struct baud_tuple
+    {
+        const char *     name;
+        enum carbon_baud baud;
+    } baud_map[] = {
+        {"9600", carbon_baud_b9600},
+        {"14400", carbon_baud_b14400},
+        {"19200", carbon_baud_b19200},
+        {"38400", carbon_baud_b38400},
+        {"57600", carbon_baud_b57600},
+        {"115200", carbon_baud_b115200},
+        {0, 0},
+    };
+
+    for (struct baud_tuple * tuple = baud_map; tuple->name; tuple++) {
+        if (strcmp(str, tuple->name) == 0) {
+            *baud = tuple->baud;
+            return 0;
+        }
+    }
+    return -1;
+}
+
 
 const char *
 str_carbon_status(enum carbon_status status)

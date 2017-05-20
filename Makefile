@@ -4,7 +4,8 @@ LIB_CARBON=carbon/libcarbon.a
 
 CFLAGS = -g ${WARN} -std=c11 -Icarbon -D_BSD_SOURCE
 
-OBJS =  src/connect.o \
+OBJS =  src/baud.o \
+	src/connect.o \
 	src/sleep.o \
 	src/connected.o \
 	src/info.o \

@@ -4,7 +4,7 @@
 int cli_info(struct carbon_ctx *ctx, struct options *options) {
     (void)options;
 
-    struct res_info info;
+    struct carbon_info info;
     int status = carbon_info(ctx, &info);
 
     if (status != carbon_status_OK) {
