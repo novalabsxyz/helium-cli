@@ -19,7 +19,7 @@ cli_find(const char * needle, struct cli_command * commands)
 }
 
 int
-baud_str(const char * str, enum carbon_baud *baud)
+baud_str(const char * str, enum carbon_baud * baud)
 {
     struct baud_tuple
     {
@@ -36,8 +36,10 @@ baud_str(const char * str, enum carbon_baud *baud)
         {0, 0},
     };
 
-    for (struct baud_tuple * tuple = baud_map; tuple->name; tuple++) {
-        if (strcmp(str, tuple->name) == 0) {
+    for (struct baud_tuple * tuple = baud_map; tuple->name; tuple++)
+    {
+        if (strcmp(str, tuple->name) == 0)
+        {
             *baud = tuple->baud;
             return 0;
         }
@@ -115,7 +117,8 @@ exit:
 int
 save_file(const char * filename, uint8_t * data, size_t len)
 {
-    int fd     = open(filename, O_CREAT | O_WRONLY);
+    int fd =
+        open(filename, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     int result = 0;
 
     if (fd == -1)
