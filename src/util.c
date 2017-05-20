@@ -27,7 +27,8 @@ baud_str(const char * str, enum carbon_baud *baud)
         enum carbon_baud baud;
     } baud_map[] = {
         {"9600", carbon_baud_b9600},
-        {"14400", carbon_baud_b14400},
+        // 14400 is not supported by default on linux
+        // {"14400", carbon_baud_b14400},
         {"19200", carbon_baud_b19200},
         {"38400", carbon_baud_b38400},
         {"57600", carbon_baud_b57600},
@@ -67,6 +68,8 @@ str_carbon_status(enum carbon_status status)
     case carbon_status_ERR_NOT_FOUND:
         return "Network resource not found";
     }
+
+    return NULL;
 }
 
 int

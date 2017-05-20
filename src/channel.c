@@ -40,7 +40,7 @@ cli_channel_send(struct carbon_ctx * ctx, struct options * options)
         printf("Missing channel id\n");
         return -1;
     }
-    else if (sscanf(arg_channel, "%u", &channel_id) != 1 || channel_id > 255)
+    else if (sscanf(arg_channel, "%d", &channel_id) != 1 || channel_id > 255)
     {
         printf("Invalid channel id\n");
         return -1;

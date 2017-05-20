@@ -111,15 +111,14 @@ open_serial_port(const char * portname, enum carbon_baud baud)
         return -1;
     }
 
-    int baud_rate = B9600;
+    speed_t baud_rate = B9600;
     switch (baud)
     {
     case carbon_baud_b9600:
         baud_rate = B9600;
         break;
     case carbon_baud_b14400:
-        baud_rate = B14400;
-        break;
+        // B14400 does not exist on linux, default to a higher speed
     case carbon_baud_b19200:
         baud_rate = B19200;
         break;
