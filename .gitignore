@@ -22,7 +22,7 @@
 *.dylib
 
 # Executables
-atom
+helium
 *.exe
 *.out
 *.app

@@ -1,14 +1,17 @@
-#include <inttypes.h>
 #include "util.h"
+#include <inttypes.h>
 
-int cli_info(struct carbon_ctx *ctx, struct options *options) {
+int
+cli_info(struct helium_ctx * ctx, struct options * options)
+{
     (void)options;
 
-    struct carbon_info info;
-    int status = carbon_info(ctx, &info);
+    struct helium_info info;
+    int                status = helium_info(ctx, &info);
 
-    if (status != carbon_status_OK) {
-        printf("%s\n", str_carbon_status(status));
+    if (status != helium_status_OK)
+    {
+        printf("%s\n", str_helium_status(status));
         return -1;
     }
 

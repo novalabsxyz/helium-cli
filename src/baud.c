@@ -2,7 +2,7 @@
 #include <inttypes.h>
 
 int
-cli_baud(struct carbon_ctx * ctx, struct options * options)
+cli_baud(struct helium_ctx * ctx, struct options * options)
 {
     const char * arg_baud = optparse_arg(&options->optparse);
 
@@ -12,17 +12,17 @@ cli_baud(struct carbon_ctx * ctx, struct options * options)
         return -1;
     }
 
-    enum carbon_baud baud;
+    enum helium_baud baud;
     if (baud_str(arg_baud, &baud) < 0)
     {
         printf("Invalid baud rate: %s\n", arg_baud);
         return -1;
     }
 
-    int status = carbon_baud(ctx, baud);
-    if (status != carbon_status_OK)
+    int status = helium_baud(ctx, baud);
+    if (status != helium_status_OK)
     {
-        printf("%s\n", str_carbon_status(status));
+        printf("%s\n", str_helium_status(status));
         return -1;
     }
 

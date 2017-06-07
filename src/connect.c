@@ -1,7 +1,7 @@
 #include "util.h"
 
 int
-cli_connect(struct carbon_ctx * ctx, struct options * options)
+cli_connect(struct helium_ctx * ctx, struct options * options)
 {
     struct connection connection;
     if (options->filename)
@@ -14,11 +14,11 @@ cli_connect(struct carbon_ctx * ctx, struct options * options)
         }
     }
 
-    int status = carbon_connect(ctx, options->filename ? &connection : NULL);
+    int status = helium_connect(ctx, options->filename ? &connection : NULL);
 
-    if (status != carbon_status_OK)
+    if (status != helium_status_OK)
     {
-        printf("%s\n", str_carbon_status(status));
+        printf("%s\n", str_helium_status(status));
         return -1;
     }
 

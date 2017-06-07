@@ -1,8 +1,8 @@
-PROJECT=atom
+PROJECT=helium
 WARN = -Wall -Wextra -pedantic
-LIB_CARBON=carbon/libcarbon.a
+LIB_HELIUM_CLIENT=helium-client/libhelium-client.a
 
-CFLAGS = -g ${WARN} -std=c11 -Icarbon -D_BSD_SOURCE
+CFLAGS = -g ${WARN} -std=c11 -Ihelium-client -D_BSD_SOURCE
 
 OBJS =  src/baud.o \
 	src/connect.o \
@@ -15,12 +15,13 @@ OBJS =  src/baud.o \
 
 all: ${PROJECT}
 
-${LIB_CARBON}:
-	@$(MAKE) -C carbon
+${LIB_HELIUM_CLIENT}:
+	@$(MAKE) -C helium-client
 
-${PROJECT}: ${OBJS} ${LIB_CARBON} src/main.c
-	${CC} -o $@ src/main.c ${CFLAGS} ${OBJS} ${LDFLAGS} ${LIB_CARBON}
+${PROJECT}: ${OBJS} ${LIB_HELIUM_CLIENT} src/main.c
+	${CC} -o $@ src/main.c ${CFLAGS} ${OBJS} ${LDFLAGS} ${LIB_HELIUM_CLIENT}
 
+.PHONY: clean
 clean:
-	@$(MAKE) -C carbon clean
-	rm -f ${OBJS} ${PROJECT} ${LIB_CARBON} *.core
+	@$(MAKE) -C helium-client clean
+	rm -f ${OBJS} ${PROJECT} ${LIB_HELIUM_CLIENT} *.core

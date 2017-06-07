@@ -19,20 +19,20 @@ cli_find(const char * needle, struct cli_command * commands)
 }
 
 int
-baud_str(const char * str, enum carbon_baud * baud)
+baud_str(const char * str, enum helium_baud * baud)
 {
     struct baud_tuple
     {
         const char *     name;
-        enum carbon_baud baud;
+        enum helium_baud baud;
     } baud_map[] = {
-        {"9600", carbon_baud_b9600},
+        {"9600", helium_baud_b9600},
         // 14400 is not supported by default on linux
-        // {"14400", carbon_baud_b14400},
-        {"19200", carbon_baud_b19200},
-        {"38400", carbon_baud_b38400},
-        {"57600", carbon_baud_b57600},
-        {"115200", carbon_baud_b115200},
+        // {"14400", helium_baud_b14400},
+        {"19200", helium_baud_b19200},
+        {"38400", helium_baud_b38400},
+        {"57600", helium_baud_b57600},
+        {"115200", helium_baud_b115200},
         {0, 0},
     };
 
@@ -49,25 +49,25 @@ baud_str(const char * str, enum carbon_baud * baud)
 
 
 const char *
-str_carbon_status(enum carbon_status status)
+str_helium_status(enum helium_status status)
 {
     switch (status)
     {
-    case carbon_status_OK:
+    case helium_status_OK:
         return NULL;
-    case carbon_status_ERR_COMMUNICATION:
+    case helium_status_ERR_COMMUNICATION:
         return "Error communication with Atom";
-    case carbon_status_ERR_NOT_CONNECTED:
+    case helium_status_ERR_NOT_CONNECTED:
         return "Atom not connected to the network";
-    case carbon_status_ERR_TIMEOUT:
+    case helium_status_ERR_TIMEOUT:
         return "Timeout while trying to connect to network";
-    case carbon_status_ERR_DROPPED:
+    case helium_status_ERR_DROPPED:
         return "Atom dropped packet";
-    case carbon_status_ERR_KEEP_AWAKE:
+    case helium_status_ERR_KEEP_AWAKE:
         return "Atom needs to stay awake";
-    case carbon_status_ERR_FAILED:
+    case helium_status_ERR_FAILED:
         return "Network request failed";
-    case carbon_status_ERR_NOT_FOUND:
+    case helium_status_ERR_NOT_FOUND:
         return "Network resource not found";
     }
 

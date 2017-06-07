@@ -1,7 +1,7 @@
 #include "util.h"
 
 int
-cli_channel_create(struct carbon_ctx * ctx, struct options * options)
+cli_channel_create(struct helium_ctx * ctx, struct options * options)
 {
     const char * arg_name = optparse_arg(&options->optparse);
     if (NULL == arg_name)
@@ -11,14 +11,12 @@ cli_channel_create(struct carbon_ctx * ctx, struct options * options)
     }
 
     uint8_t channel_id;
-    int     status = carbon_channel_create(ctx,
-                                       arg_name,
-                                       strlen(arg_name),
-                                       &channel_id);
+    int     status =
+        helium_channel_create(ctx, arg_name, strlen(arg_name), &channel_id);
 
-    if (status != carbon_status_OK)
+    if (status != helium_status_OK)
     {
-        printf("Error creating channel: %s\n", str_carbon_status(status));
+        printf("Error creating channel: %s\n", str_helium_status(status));
         return -1;
     }
 
@@ -27,11 +25,11 @@ cli_channel_create(struct carbon_ctx * ctx, struct options * options)
 }
 
 int
-cli_channel_send(struct carbon_ctx * ctx, struct options * options)
+cli_channel_send(struct helium_ctx * ctx, struct options * options)
 {
     const char * arg_channel = optparse_arg(&options->optparse);
     const char * arg_str     = optparse_arg(&options->optparse);
-    uint8_t      data[CARBON_MAX_DATA_SIZE];
+    uint8_t      data[HELIUM_MAX_DATA_SIZE];
     int          data_len = 0;
     int          channel_id;
 
@@ -63,11 +61,11 @@ cli_channel_send(struct carbon_ctx * ctx, struct options * options)
 
     uint8_t send_result;
     int     status =
-        carbon_channel_send(ctx, channel_id, data, data_len, &send_result);
+        helium_channel_send(ctx, channel_id, data, data_len, &send_result);
 
-    if (status != carbon_status_OK)
+    if (status != helium_status_OK)
     {
-        printf("Error sending on channel: %s\n", str_carbon_status(status));
+        printf("Error sending on channel: %s\n", str_helium_status(status));
         return -1;
     }
 
@@ -81,7 +79,7 @@ static struct cli_command commands[] = {
 };
 
 int
-cli_channel(struct carbon_ctx * ctx, struct options * options)
+cli_channel(struct helium_ctx * ctx, struct options * options)
 {
     const char * arg_cmd = optparse_arg(&options->optparse);
     cli_func     func    = cli_find(arg_cmd, commands);

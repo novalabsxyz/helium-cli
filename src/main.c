@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 bool
-carbon_serial_readable(void * param)
+helium_serial_readable(void * param)
 {
     struct pollfd pollfd = {
         .fd = (int)(intptr_t)param, .events = POLLIN,
@@ -23,19 +23,19 @@ carbon_serial_readable(void * param)
 }
 
 bool
-carbon_serial_getc(void * param, uint8_t * ch)
+helium_serial_getc(void * param, uint8_t * ch)
 {
     return read((int)(intptr_t)param, ch, 1) > 0;
 }
 
 bool
-carbon_serial_putc(void * param, uint8_t ch)
+helium_serial_putc(void * param, uint8_t ch)
 {
     return write((int)(intptr_t)param, &ch, 1) == 1;
 }
 
 void
-carbon_wait_us(void * param, uint32_t us)
+helium_wait_us(void * param, uint32_t us)
 {
     (void)param;
     usleep(us);
@@ -82,7 +82,7 @@ set_interface_attribs(int fd, int speed)
 }
 
 int
-open_serial_port(const char * portname, enum carbon_baud baud)
+open_serial_port(const char * portname, enum helium_baud baud)
 {
     int fd;
     fd = open(portname, O_RDWR | O_NOCTTY | O_NONBLOCK);
@@ -114,21 +114,21 @@ open_serial_port(const char * portname, enum carbon_baud baud)
     speed_t baud_rate = B9600;
     switch (baud)
     {
-    case carbon_baud_b9600:
+    case helium_baud_b9600:
         baud_rate = B9600;
         break;
-    case carbon_baud_b14400:
+    case helium_baud_b14400:
         // B14400 does not exist on linux, default to a higher speed
-    case carbon_baud_b19200:
+    case helium_baud_b19200:
         baud_rate = B19200;
         break;
-    case carbon_baud_b38400:
+    case helium_baud_b38400:
         baud_rate = B38400;
         break;
-    case carbon_baud_b57600:
+    case helium_baud_b57600:
         baud_rate = B57600;
         break;
-    case carbon_baud_b115200:
+    case helium_baud_b115200:
         baud_rate = B115200;
         break;
     }
@@ -174,12 +174,12 @@ usage(const char * app)
         app);
 }
 
-int(cli_connect)(struct carbon_ctx * ctx, struct options * options);
-int(cli_connected)(struct carbon_ctx * ctx, struct options * options);
-int(cli_sleep)(struct carbon_ctx * ctx, struct options * options);
-int(cli_info)(struct carbon_ctx * ctx, struct options * options);
-int(cli_baud)(struct carbon_ctx * ctx, struct options * options);
-int(cli_channel)(struct carbon_ctx * ctx, struct options * options);
+int(cli_connect)(struct helium_ctx * ctx, struct options * options);
+int(cli_connected)(struct helium_ctx * ctx, struct options * options);
+int(cli_sleep)(struct helium_ctx * ctx, struct options * options);
+int(cli_info)(struct helium_ctx * ctx, struct options * options);
+int(cli_baud)(struct helium_ctx * ctx, struct options * options);
+int(cli_channel)(struct helium_ctx * ctx, struct options * options);
 
 static struct cli_command commands[] = {
     {.name = "baud", .func = cli_baud},
@@ -247,8 +247,8 @@ main(int argc, char ** argv)
         ERR_NEXIT(-1);
     }
 
-    struct carbon_ctx ctx;
-    carbon_init(&ctx, (void *)(intptr_t)fd);
+    struct helium_ctx ctx;
+    helium_init(&ctx, (void *)(intptr_t)fd);
 
     cli_func func = cli_find(arg_cmd, commands);
     if (NULL == func)

@@ -1,15 +1,15 @@
 #include "util.h"
 
 int
-cli_connected(struct carbon_ctx * ctx, struct options * options)
+cli_connected(struct helium_ctx * ctx, struct options * options)
 {
     (void)options;
 
-    int status = carbon_connected(ctx);
+    int status = helium_connected(ctx);
 
-    if (status != carbon_status_OK)
+    if (status != helium_status_OK)
     {
-        printf("%s\n", str_carbon_status(status));
+        printf("%s\n", str_helium_status(status));
         return -1;
     }
 
