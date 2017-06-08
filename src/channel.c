@@ -10,13 +10,18 @@ cli_channel_create(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
-    uint8_t channel_id;
-    int     status =
+    int8_t channel_id;
+    int    status =
         helium_channel_create(ctx, arg_name, strlen(arg_name), &channel_id);
 
     if (status != helium_status_OK)
     {
         printf("Error creating channel: %s\n", str_helium_status(status));
+        return -1;
+    }
+    else if (channel_id < 0)
+    {
+        printf("Error creating channel: %d\n", channel_id);
         return -1;
     }
 
@@ -59,8 +64,8 @@ cli_channel_send(struct helium_ctx * ctx, struct options * options)
         return data_len;
     }
 
-    uint8_t send_result;
-    int     status =
+    int8_t send_result;
+    int    status =
         helium_channel_send(ctx, channel_id, data, data_len, &send_result);
 
     if (status != helium_status_OK)
@@ -68,8 +73,13 @@ cli_channel_send(struct helium_ctx * ctx, struct options * options)
         printf("Error sending on channel: %s\n", str_helium_status(status));
         return -1;
     }
+    else if (send_result != 0)
+    {
+        printf("Error sending on channel: %d\n", send_result);
+        return -1;
+    }
 
-    return send_result;
+    return 0;
 }
 
 static struct cli_command commands[] = {
