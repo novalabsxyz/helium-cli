@@ -2,7 +2,7 @@ PROJECT=helium
 WARN = -Wall -Wextra -pedantic
 LIB_HELIUM_CLIENT=helium-client/libhelium-client.a
 
-CFLAGS = -g ${WARN} -std=c11 -Ihelium-client -D_BSD_SOURCE
+CFLAGS = -g ${WARN} -std=c11 -Ihelium-client -D_BSD_SOURCE -D_DEFAULT_SOURCE
 
 OBJS =  src/baud.o \
 	src/connect.o \
