@@ -14,7 +14,9 @@ cli_connect(struct helium_ctx * ctx, struct options * options)
         }
     }
 
-    int status = helium_connect(ctx, options->filename ? &connection : NULL);
+    int status = helium_connect(ctx,
+                                options->filename ? &connection : NULL,
+                                HELIUM_POLL_RETRIES_5S);
 
     if (status != helium_status_OK)
     {

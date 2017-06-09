@@ -10,22 +10,27 @@ cli_channel_create(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
-    int8_t channel_id;
-    int    status =
-        helium_channel_create(ctx, arg_name, strlen(arg_name), &channel_id);
+    uint16_t token;
+    int8_t   result;
+    int status = helium_channel_create(ctx, arg_name, strlen(arg_name), &token);
+    if (helium_status_OK == status)
+    {
+        status = helium_channel_poll(ctx, token, &result, HELIUM_POLL_RETRIES_5S);
+    }
 
     if (status != helium_status_OK)
     {
         printf("Error creating channel: %s\n", str_helium_status(status));
         return -1;
     }
-    else if (channel_id < 0)
+
+    if (result < 0)
     {
-        printf("Error creating channel: %d\n", channel_id);
+        printf("Error creating channel: %d\n", result);
         return -1;
     }
 
-    printf("Channel created: %d\n", channel_id);
+    printf("Channel created: %d\n", result);
     return 0;
 }
 
@@ -64,18 +69,23 @@ cli_channel_send(struct helium_ctx * ctx, struct options * options)
         return data_len;
     }
 
-    int8_t send_result;
-    int    status =
-        helium_channel_send(ctx, channel_id, data, data_len, &send_result);
+    uint16_t token;
+    int8_t   result;
+    int status = helium_channel_send(ctx, channel_id, data, data_len, &token);
+    if (helium_status_OK == status)
+    {
+        status = helium_channel_poll(ctx, token, &result, HELIUM_POLL_RETRIES_5S);
+    }
 
     if (status != helium_status_OK)
     {
         printf("Error sending on channel: %s\n", str_helium_status(status));
         return -1;
     }
-    else if (send_result != 0)
+
+    if (result != 0)
     {
-        printf("Error sending on channel: %d\n", send_result);
+        printf("Error sending on channel: %d\n", result);
         return -1;
     }
 

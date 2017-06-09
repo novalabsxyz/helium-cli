@@ -55,6 +55,8 @@ str_helium_status(enum helium_status status)
     {
     case helium_status_OK:
         return NULL;
+    case helium_status_OK_NO_DATA:
+        return "Timeout waiting for data";
     case helium_status_ERR_COMMUNICATION:
         return "Error communication with Atom";
     case helium_status_ERR_NOT_CONNECTED:
