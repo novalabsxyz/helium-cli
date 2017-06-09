@@ -33,3 +33,4 @@ helium
 # Debug files
 *.dSYM/
 *.su
+TAGS
