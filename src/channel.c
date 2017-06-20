@@ -1,5 +1,22 @@
 #include "util.h"
 
+static int
+_parse_channel_id(const char * arg_channel, int * channel_id)
+{
+    if (NULL == arg_channel)
+    {
+        printf("Missing channel id\n");
+        return -1;
+    }
+    else if (sscanf(arg_channel, "%d", channel_id) != 1 || *channel_id > 255)
+    {
+        printf("Invalid channel id\n");
+        return -1;
+    }
+
+    return 0;
+}
+
 int
 cli_channel_create(struct helium_ctx * ctx, struct options * options)
 {
@@ -43,14 +60,8 @@ cli_channel_send(struct helium_ctx * ctx, struct options * options)
     int          data_len = 0;
     int          channel_id;
 
-    if (NULL == arg_channel)
+    if (_parse_channel_id(arg_channel, &channel_id) != 0)
     {
-        printf("Missing channel id\n");
-        return -1;
-    }
-    else if (sscanf(arg_channel, "%d", &channel_id) != 1 || channel_id > 255)
-    {
-        printf("Invalid channel id\n");
         return -1;
     }
 
@@ -92,9 +103,41 @@ cli_channel_send(struct helium_ctx * ctx, struct options * options)
     return 0;
 }
 
+int
+cli_channel_poll(struct helium_ctx * ctx, struct options * options)
+{
+    const char * arg_channel = optparse_arg(&options->optparse);
+    int          channel_id;
+    uint8_t      data[HELIUM_MAX_DATA_SIZE];
+    size_t       used = 0;
+
+    if (_parse_channel_id(arg_channel, &channel_id) != 0)
+    {
+        return -1;
+    }
+
+    int status = helium_status_OK_NO_DATA;
+    while (status == helium_status_OK || status == helium_status_OK_NO_DATA) {
+        status = helium_channel_poll_data(ctx,
+                                          channel_id,
+                                          data,
+                                          HELIUM_MAX_DATA_SIZE,
+                                          &used,
+                                          HELIUM_POLL_RETRIES_5S);
+        if (helium_status_OK == status)
+        {
+            printf("%s\n", data);
+        }
+    }
+
+    printf("Error polling channel: %s\n", str_helium_status(status));
+    return -1;
+}
+
 static struct cli_command commands[] = {
     {.name = "create", .func = cli_channel_create},
     {.name = "send", .func = cli_channel_send},
+    {.name = "poll", .func = cli_channel_poll},
     {0, 0},
 };
 

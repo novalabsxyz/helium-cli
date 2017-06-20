@@ -61,14 +61,10 @@ str_helium_status(enum helium_status status)
         return "Error communication with Atom";
     case helium_status_ERR_NOT_CONNECTED:
         return "Atom not connected to the network";
-    case helium_status_ERR_TIMEOUT:
-        return "Timeout while trying to connect to network";
     case helium_status_ERR_DROPPED:
         return "Atom dropped packet";
     case helium_status_ERR_KEEP_AWAKE:
         return "Atom needs to stay awake";
-    case helium_status_ERR_NOT_FOUND:
-        return "Network resource not found";
     }
 
     return NULL;
