@@ -121,15 +121,22 @@ cli_channel_poll(struct helium_ctx * ctx, struct options * options)
     int status = helium_status_OK_NO_DATA;
     while (status == helium_status_OK || status == helium_status_OK_NO_DATA)
     {
-        status = helium_channel_poll_data(ctx,
-                                          channel_id,
-                                          data,
-                                          HELIUM_MAX_DATA_SIZE,
-                                          &used,
-                                          HELIUM_POLL_RETRIES_5S);
-        if (helium_status_OK == status)
+        // Send to an invalid channel to trigger any pending downlink
+        // messages
+        status = helium_channel_send(ctx, 0, "", 0, NULL);
+        // Then handle any downlink messages
+        while (status == helium_status_OK)
         {
-            printf("%.*s\n", (int)used, data);
+            status = helium_channel_poll_data(ctx,
+                                              channel_id,
+                                              data,
+                                              HELIUM_MAX_DATA_SIZE,
+                                              &used,
+                                              HELIUM_POLL_RETRIES_5S);
+            if (helium_status_OK == status)
+            {
+                printf("%.*s\n", (int)used, data);
+            }
         }
     }
 
