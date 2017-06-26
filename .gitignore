@@ -33,4 +33,5 @@ helium
 # Debug files
 *.dSYM/
 *.su
+.tramp_history
 TAGS

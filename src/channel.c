@@ -129,7 +129,7 @@ cli_channel_poll(struct helium_ctx * ctx, struct options * options)
                                           HELIUM_POLL_RETRIES_5S);
         if (helium_status_OK == status)
         {
-            printf("%s\n", data);
+            printf("%.*s\n", (int)used, data);
         }
     }
 
