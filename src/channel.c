@@ -119,7 +119,7 @@ cli_channel_poll(struct helium_ctx * ctx, struct options * options)
     }
 
     int status = helium_status_OK_NO_DATA;
-    while (status == helium_status_OK || status == helium_status_OK_NO_DATA)
+    while (status != helium_status_ERR_COMMUNICATION && status != helium_status_ERR_NOT_CONNECTED)
     {
         // Send to an invalid channel to trigger any pending downlink
         // messages
