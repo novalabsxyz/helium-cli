@@ -169,7 +169,10 @@ usage(const char * app)
         "                            channel.\n"
         "  channel send <id> [text]  Sends the given [text] to the given\n"
         "                            channel <id>. If [text] is not specified\n"
-        "                            '-f' is checked for a filename to send.\n",
+        "                            '-f' is checked for a filename to send.\n"
+        "  channel poll <id>         Poll a given channel for downlink data.\n"
+        "                            The channel is polled for data\n"
+        "                            every 5 seconds\n",
         app,
         app);
 }
