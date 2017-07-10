@@ -7,6 +7,7 @@ CFLAGS = -g ${WARN} -std=c11 -Ihelium-client -D_BSD_SOURCE -D_DEFAULT_SOURCE
 OBJS =  src/baud.o \
 	src/connect.o \
 	src/sleep.o \
+	src/reset.o \
 	src/connected.o \
 	src/info.o \
 	src/channel.o \

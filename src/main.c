@@ -163,6 +163,7 @@ usage(const char * app)
         "                            Use '-f' to specify quick connect\n"
         "                            filename (default 'connection.dat').\n"
         "  info                      Print information of the atom.\n"
+        "  reset                     Reset the atom.\n\n"
 
         "  channel create <name>     Create a channel with a given <name>.\n"
         "                            Prints out the id of the created\n"
@@ -180,6 +181,7 @@ usage(const char * app)
 int(cli_connect)(struct helium_ctx * ctx, struct options * options);
 int(cli_connected)(struct helium_ctx * ctx, struct options * options);
 int(cli_sleep)(struct helium_ctx * ctx, struct options * options);
+int(cli_reset)(struct helium_ctx * ctx, struct options * options);
 int(cli_info)(struct helium_ctx * ctx, struct options * options);
 int(cli_baud)(struct helium_ctx * ctx, struct options * options);
 int(cli_channel)(struct helium_ctx * ctx, struct options * options);
@@ -190,6 +192,7 @@ static struct cli_command commands[] = {
     {.name = "connected", .func = cli_connected},
     {.name = "sleep", .func = cli_sleep},
     {.name = "info", .func = cli_info},
+    {.name = "reset", .func = cli_reset},
     {.name = "channel", .func = cli_channel},
     {0, 0},
 };
