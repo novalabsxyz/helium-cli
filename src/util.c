@@ -65,6 +65,8 @@ str_helium_status(enum helium_status status)
         return "Atom dropped packet";
     case helium_status_ERR_KEEP_AWAKE:
         return "Atom needs to stay awake";
+    case helium_status_ERR_CODING:
+        return "Error in data encoding";
     }
 
     return NULL;
