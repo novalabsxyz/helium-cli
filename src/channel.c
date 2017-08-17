@@ -223,6 +223,10 @@ _str_to_value(const char * str, enum helium_config_type * value_type, void * val
     case 'n':
         *value_type = helium_config_null;
         return strcmp(str, "null");
+    case '"':
+        *value_type = helium_config_str;
+        memcpy(value, str+1, strlen(str) - 1);
+        return str[strlen(str) - 1] == '"' ? 0 : -1;
     default:
     {
         char * endptr;
@@ -264,12 +268,11 @@ cli_channel_config_set(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
-
     char                    value[100];
     enum helium_config_type value_type;
     if (_str_to_value(arg_config_val, &value_type, value) != 0)
     {
-        printf("Invalid configuration value\n");
+        printf("Invalid configuration value: %s\n", arg_config_val);
         return -1;
     }
 
