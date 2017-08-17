@@ -8,6 +8,7 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <time.h>
 
 bool
 helium_serial_readable(void * param)
@@ -213,6 +214,7 @@ main(int argc, char ** argv)
                                        {"channel", 'c', OPTPARSE_REQUIRED},
                                        {0, 0, 0}};
 
+    srand(time(NULL));
     options_init(&options, argv);
     while ((opt = optparse_long(&options.optparse, longopts, &longindex)) != -1)
     {

@@ -140,9 +140,9 @@ cli_channel_poll(struct helium_ctx * ctx, struct options * options)
 
 
 static int
-channel_config_poll_handler(const char *            key,
-                            enum helium_config_type value_type,
-                            void *                  value)
+channel_config_get_handler(const char *            key,
+                           enum helium_config_type value_type,
+                           void *                  value)
 {
     printf("%s: ", key);
     switch (value_type)
@@ -186,13 +186,15 @@ cli_channel_config_get(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
-    int status = helium_channel_config_get(ctx, channel_id, arg_config_key);
+    uint16_t token;
+    int      status =
+        helium_channel_config_get(ctx, channel_id, arg_config_key, &token);
     if (helium_status_OK == status)
     {
-        status = helium_channel_config_poll(ctx,
-                                            channel_id,
-                                            channel_config_poll_handler,
-                                            HELIUM_POLL_RETRIES_5S);
+        status = helium_channel_config_get_poll_result(ctx,
+                                                       token,
+                                                       channel_config_get_handler,
+                                                       HELIUM_POLL_RETRIES_5S);
     }
 
     if (helium_status_OK != status)
@@ -282,10 +284,10 @@ cli_channel_config_set(struct helium_ctx * ctx, struct options * options)
     int8_t result;
     if (helium_status_OK == status)
     {
-        status = helium_channel_config_poll_result(ctx,
-                                                   token,
-                                                   &result,
-                                                   HELIUM_POLL_RETRIES_5S);
+        status = helium_channel_config_set_poll_result(ctx,
+                                                       token,
+                                                       &result,
+                                                       HELIUM_POLL_RETRIES_5S);
     }
 
     if (status != helium_status_OK)
