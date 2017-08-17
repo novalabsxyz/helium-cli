@@ -225,7 +225,7 @@ _str_to_value(const char * str, enum helium_config_type * value_type, void * val
         return strcmp(str, "null");
     case '"':
         *value_type = helium_config_str;
-        memcpy(value, str+1, strlen(str) - 1);
+        memcpy(value, str+1, strlen(str) - 2);
         return str[strlen(str) - 1] == '"' ? 0 : -1;
     default:
     {
