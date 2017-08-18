@@ -138,7 +138,6 @@ cli_channel_poll(struct helium_ctx * ctx, struct options * options)
 }
 
 
-
 static int
 channel_config_get_handler(const char *            key,
                            enum helium_config_type value_type,
@@ -225,7 +224,7 @@ _str_to_value(const char * str, enum helium_config_type * value_type, void * val
         return strcmp(str, "null");
     case '"':
         *value_type = helium_config_str;
-        memcpy(value, str+1, strlen(str) - 2);
+        memcpy(value, str + 1, strlen(str) - 2);
         return str[strlen(str) - 1] == '"' ? 0 : -1;
     default:
     {
@@ -309,9 +308,42 @@ cli_channel_config_set(struct helium_ctx * ctx, struct options * options)
 }
 
 
+int
+cli_channel_config_poll(struct helium_ctx * ctx, struct options * options)
+{
+    const char * arg_channel = optparse_arg(&options->optparse);
+    int          channel_id;
+
+    if (_parse_channel_id(arg_channel, &channel_id) != 0)
+    {
+        return -1;
+    }
+
+    int  status = helium_status_OK_NO_DATA;
+    bool invalidate;
+    while (status == helium_status_OK || status == helium_status_OK_NO_DATA)
+    {
+        status = helium_channel_config_poll_invalidate(ctx,
+                                                       channel_id,
+                                                       &invalidate,
+                                                       HELIUM_POLL_RETRIES_5S);
+        if (helium_status_OK == status && invalidate)
+        {
+            printf("Configuration invalidated\n");
+        }
+    }
+
+    printf("Error polling channel: %s\n", str_helium_status(status));
+    return -1;
+}
+
+
+
+
 static struct cli_command channel_config_commands[] = {
     {.name = "get", .func = cli_channel_config_get},
     {.name = "set", .func = cli_channel_config_set},
+    {.name = "poll", .func = cli_channel_config_poll},
     {0, 0},
 };
 
