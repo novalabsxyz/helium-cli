@@ -35,3 +35,7 @@ helium
 *.su
 .tramp_history
 TAGS
+GPATH
+GRTAGS
+GTAGS
+compile_commands.json

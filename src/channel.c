@@ -138,11 +138,13 @@ cli_channel_poll(struct helium_ctx * ctx, struct options * options)
 }
 
 
-static int
-channel_config_get_handler(const char *            key,
+static bool
+channel_config_get_handler(void *                  ctx,
+                           const char *            key,
                            enum helium_config_type value_type,
                            void *                  value)
 {
+    (void)ctx;
     printf("%s: ", key);
     switch (value_type)
     {
@@ -164,7 +166,7 @@ channel_config_get_handler(const char *            key,
     }
     printf("\n");
 
-    return helium_status_OK;
+    return true;
 }
 
 int
@@ -193,6 +195,7 @@ cli_channel_config_get(struct helium_ctx * ctx, struct options * options)
         status = helium_channel_config_get_poll_result(ctx,
                                                        token,
                                                        channel_config_get_handler,
+                                                       NULL,
                                                        HELIUM_POLL_RETRIES_5S);
     }
 
