@@ -174,7 +174,18 @@ usage(const char * app)
         "                            '-f' is checked for a filename to send.\n"
         "  channel poll <id>         Poll a given channel for downlink data.\n"
         "                            The channel is polled for data\n"
-        "                            every 5 seconds\n",
+        "                            every 5 seconds\n\n"
+
+        "  channel config get <id> <key> \n"
+        "                           Get a configuration value for the given key.\n"
+        "  channel config set <id> <key> <value> \n"
+        "                           Set a configuration value for a given key\n"
+        "                           given key. Values are expressed as JSON\n"
+        "                           null, numbers (int, float), boolean (true, false),\n"
+        "                           and strings.\n"
+        "  channel config poll <id> \n"
+        "                           Poll channel configuration for a stale config\n"
+        "                           indicator every 5 seconds.\n",
         app,
         app);
 }
