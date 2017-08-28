@@ -187,6 +187,7 @@ cli_channel_config_get(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
+    int8_t result;
     uint16_t token;
     int      status =
         helium_channel_config_get(ctx, channel_id, arg_config_key, &token);
@@ -196,12 +197,19 @@ cli_channel_config_get(struct helium_ctx * ctx, struct options * options)
                                                        token,
                                                        channel_config_get_handler,
                                                        NULL,
+                                                       &result,
                                                        HELIUM_POLL_RETRIES_5S);
     }
 
     if (helium_status_OK != status)
     {
         printf("Error requesting configuration: %s\n", str_helium_status(status));
+        return -1;
+    }
+
+    if (result != 0)
+    {
+        printf("Error requesting configuration: %d\n", result);
         return -1;
     }
 
