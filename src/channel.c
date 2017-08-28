@@ -236,6 +236,7 @@ _str_to_value(const char * str, enum helium_config_type * value_type, void * val
     case '"':
         *value_type = helium_config_str;
         memcpy(value, str + 1, strlen(str) - 2);
+        ((char *)value)[strlen(str) - 2] = '\0';
         return str[strlen(str) - 1] == '"' ? 0 : -1;
     default:
     {
@@ -311,7 +312,7 @@ cli_channel_config_set(struct helium_ctx * ctx, struct options * options)
 
     if (result != 0)
     {
-        printf("Error sending on channel: %d\n", result);
+        printf("Error setting configuration: %d\n", result);
         return -1;
     }
 
