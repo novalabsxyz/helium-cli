@@ -8,6 +8,7 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <time.h>
 
 bool
 helium_serial_readable(void * param)
@@ -173,7 +174,18 @@ usage(const char * app)
         "                            '-f' is checked for a filename to send.\n"
         "  channel poll <id>         Poll a given channel for downlink data.\n"
         "                            The channel is polled for data\n"
-        "                            every 5 seconds\n",
+        "                            every 5 seconds\n\n"
+
+        "  channel config get <id> <key> \n"
+        "                           Get a configuration value for the given key.\n"
+        "  channel config set <id> <key> <value> \n"
+        "                           Set a configuration value for a given key\n"
+        "                           given key. Values are expressed as JSON\n"
+        "                           null, numbers (int, float), boolean (true, false),\n"
+        "                           and strings.\n"
+        "  channel config poll <id> \n"
+        "                           Poll channel configuration for a stale config\n"
+        "                           indicator every 5 seconds.\n",
         app,
         app);
 }
@@ -213,6 +225,7 @@ main(int argc, char ** argv)
                                        {"channel", 'c', OPTPARSE_REQUIRED},
                                        {0, 0, 0}};
 
+    srand(time(NULL));
     options_init(&options, argv);
     while ((opt = optparse_long(&options.optparse, longopts, &longindex)) != -1)
     {
