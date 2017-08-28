@@ -187,7 +187,7 @@ cli_channel_config_get(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
-    int8_t result;
+    int8_t   result;
     uint16_t token;
     int      status =
         helium_channel_config_get(ctx, channel_id, arg_config_key, &token);
