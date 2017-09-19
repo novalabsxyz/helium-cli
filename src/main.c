@@ -174,7 +174,8 @@ usage(const char * app)
         "                            '-f' is checked for a filename to send.\n"
         "  channel poll <id>         Poll a given channel for downlink data.\n"
         "                            The channel is polled for data\n"
-        "                            every 5 seconds\n\n"
+        "                            every 5 seconds\n"
+        "  channel ping <id>         Ping a given channel.\n\n"
 
         "  channel config get <id> <key> \n"
         "                           Get a configuration value for the given key.\n"

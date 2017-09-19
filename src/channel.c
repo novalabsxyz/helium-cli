@@ -29,11 +29,10 @@ cli_channel_create(struct helium_ctx * ctx, struct options * options)
 
     uint16_t token;
     int8_t   result;
-    int status = helium_channel_create(ctx, arg_name, strlen(arg_name), &token);
+    int status = helium_create_channel(ctx, arg_name, strlen(arg_name), &token);
     if (helium_status_OK == status)
     {
-        status =
-            helium_channel_poll_result(ctx, token, &result, HELIUM_POLL_RETRIES_5S);
+        status = helium_poll_result(ctx, token, &result, HELIUM_POLL_RETRIES_5S);
     }
 
     if (status != helium_status_OK)
@@ -81,13 +80,18 @@ cli_channel_send(struct helium_ctx * ctx, struct options * options)
         return data_len;
     }
 
+    struct helium_channel channel;
+    helium_channel_init(&channel, ctx, channel_id);
+
     uint16_t token;
     int8_t   result;
-    int status = helium_channel_send(ctx, channel_id, data, data_len, &token);
+    int      status = helium_channel_send(&channel, data, data_len, &token);
     if (helium_status_OK == status)
     {
-        status =
-            helium_channel_poll_result(ctx, token, &result, HELIUM_POLL_RETRIES_5S);
+        status = helium_poll_result(channel.helium,
+                                    token,
+                                    &result,
+                                    HELIUM_POLL_RETRIES_5S);
     }
 
     if (status != helium_status_OK)
@@ -118,11 +122,13 @@ cli_channel_poll(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
+    struct helium_channel channel;
+    helium_channel_init(&channel, ctx, channel_id);
+
     int status = helium_status_OK_NO_DATA;
     while (status == helium_status_OK || status == helium_status_OK_NO_DATA)
     {
-        status = helium_channel_poll_data(ctx,
-                                          channel_id,
+        status = helium_channel_poll_data(&channel,
                                           data,
                                           HELIUM_MAX_DATA_SIZE,
                                           &used,
@@ -135,6 +141,47 @@ cli_channel_poll(struct helium_ctx * ctx, struct options * options)
 
     printf("Error polling channel: %s\n", str_helium_status(status));
     return -1;
+}
+
+
+int
+cli_channel_ping(struct helium_ctx * ctx, struct options * options)
+{
+    const char * arg_channel = optparse_arg(&options->optparse);
+    int          channel_id;
+
+    if (_parse_channel_id(arg_channel, &channel_id) != 0)
+    {
+        return -1;
+    }
+
+    struct helium_channel channel;
+    helium_channel_init(&channel, ctx, channel_id);
+
+    uint16_t token;
+    int8_t   result;
+    int      status = helium_channel_ping(&channel, &token);
+    if (helium_status_OK == status)
+    {
+        status = helium_poll_result(channel.helium,
+                                    token,
+                                    &result,
+                                    HELIUM_POLL_RETRIES_5S);
+    }
+
+    if (status != helium_status_OK)
+    {
+        printf("Error pinging channel: %s\n", str_helium_status(status));
+        return -1;
+    }
+
+    if (result != 0)
+    {
+        printf("Error pinging channel: %d\n", result);
+        return -1;
+    }
+
+    return 0;
 }
 
 
@@ -187,18 +234,23 @@ cli_channel_config_get(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
+    struct helium_channel channel;
+    helium_channel_init(&channel, ctx, channel_id);
+
+    struct helium_config config;
+    helium_config_init(&config, &channel);
+
     int8_t   result;
     uint16_t token;
-    int      status =
-        helium_channel_config_get(ctx, channel_id, arg_config_key, &token);
+    int      status = helium_config_get(&config, arg_config_key, &token);
     if (helium_status_OK == status)
     {
-        status = helium_channel_config_get_poll_result(ctx,
-                                                       token,
-                                                       channel_config_get_handler,
-                                                       NULL,
-                                                       &result,
-                                                       HELIUM_POLL_RETRIES_5S);
+        status = helium_config_get_poll_result(&config,
+                                               token,
+                                               channel_config_get_handler,
+                                               NULL,
+                                               &result,
+                                               HELIUM_POLL_RETRIES_5S);
     }
 
     if (helium_status_OK != status)
@@ -287,21 +339,26 @@ cli_channel_config_set(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
+    struct helium_channel channel;
+    helium_channel_init(&channel, ctx, channel_id);
+
+    struct helium_config config;
+    helium_config_init(&config, &channel);
+
     uint16_t token;
-    int      status = helium_channel_config_set(ctx,
-                                           channel_id,
-                                           arg_config_key,
-                                           value_type,
-                                           (void *)value,
-                                           &token);
+    int      status = helium_config_set(&config,
+                                   arg_config_key,
+                                   value_type,
+                                   (void *)value,
+                                   &token);
 
     int8_t result;
     if (helium_status_OK == status)
     {
-        status = helium_channel_config_set_poll_result(ctx,
-                                                       token,
-                                                       &result,
-                                                       HELIUM_POLL_RETRIES_5S);
+        status = helium_config_set_poll_result(&config,
+                                               token,
+                                               &result,
+                                               HELIUM_POLL_RETRIES_5S);
     }
 
     if (status != helium_status_OK)
@@ -331,14 +388,19 @@ cli_channel_config_poll(struct helium_ctx * ctx, struct options * options)
         return -1;
     }
 
+    struct helium_channel channel;
+    helium_channel_init(&channel, ctx, channel_id);
+
+    struct helium_config config;
+    helium_config_init(&config, &channel);
+
     int  status = helium_status_OK_NO_DATA;
     bool invalidate;
     while (status == helium_status_OK || status == helium_status_OK_NO_DATA)
     {
-        status = helium_channel_config_poll_invalidate(ctx,
-                                                       channel_id,
-                                                       &invalidate,
-                                                       HELIUM_POLL_RETRIES_5S);
+        status = helium_config_poll_invalidate(&config,
+                                               &invalidate,
+                                               HELIUM_POLL_RETRIES_5S);
         if (helium_status_OK == status && invalidate)
         {
             printf("Configuration invalidated\n");
@@ -379,6 +441,7 @@ static struct cli_command channel_commands[] = {
     {.name = "create", .func = cli_channel_create},
     {.name = "send", .func = cli_channel_send},
     {.name = "poll", .func = cli_channel_poll},
+    {.name = "ping", .func = cli_channel_ping},
     {.name = "config", .func = cli_channel_config},
     {0, 0},
 };
