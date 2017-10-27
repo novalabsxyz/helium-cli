@@ -19,7 +19,7 @@
 	- Connect "./helium -p <port> connect"
 	- Check connection "./helium -p <port> connected" (returns 0 if connected)
 	- Create channel "./helium -p <port> channel create "Helium MQTT"" (prints channel ID if successful)
-	- Channel send "./helium -p <port> channel send <id> "hello world!""
+	- Channel send "./helium -p <port> channel send <id> "hello world""
 	- Channel poll "./helium -p <port> channel poll <id>"
 
 ### Further documentation and examples: 
