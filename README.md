@@ -1,96 +1,166 @@
-# Atom Command Line Interface (CLI)
-***
+# The Helium Command Line Interface (CLI)
 
-The Atom CLI package enables USB connected devices to connect, send, and poll client transmissions through a terminal command line. 
+The Helium CLI enables USB-connected [Helium Atoms](https://www.helium.com/dev/architecture/overview#atom-module) to connect, send data to, and receive data from the Helium network via the command line. This document covers the setup of the `helium-cli` tool, its basic funtionality, and demonstrated use.
 
-This document covers the setup of the helium-cli tool, its basic funtionality, and demonstrated use.
+* If you don't have any Helium hardware yet to use with this guide, head to the [Helium Store](https://helium.com/store) and pick up a [Helium Starter Kit with USB Adapter](https://www.helium.com/products/helium-starter-kit-eth). 
+* Need support or have questions about this? Find us in the [Helium Developer Slack](http://chat.helium.com) or post a message to the [Helium Developer Forum](https://forum.helium.com).
 
-* [Setting up Helium-CLI](#setup)
-* [Commands via CLI](#commands)
-* [Helium-CLI examples](#cli-examples)
+--- 
+
+* [Building the CLI](#setup)
+* [CLI Commands](#commands)
+* [CLI Examples](#cli-examples)
 * [Further Reading](#further-reading)
 
 
----
+## <h2 id="setup">Building the Helium CLI</h2>
 
-## <h2 id="setup">Setting up Helium-CLI</h2>
+Downloading and building the CLI is quick and painless. 
 
-Downloading and building the Helium-CLI.
+1. Clone this repo (and don't forget `--recursive`). 
 
-In Terminal:
+``` 
+$ git clone --recursive https://github.com/helium/helium-cli.git
+```
 
-1. Go to https://github.com/helium/helium-cli and clone the Helium-CLI repository.
-  * "git clone --recursive https://github.com/helium/helium-cli.git" (don't forget --recursive)
-2. Enter "cd helium-cli"
-3. Enter "make"
-4. Test the connection:
-  * "./helium -p < the-comm-port-you-connected-to > info" (e.g. ./helium -p /dev/tty.usbserial-DN01IQCC info)
+2. Navigate into this directory and run `make`.
 
+``` 
+$ cd path/to/helium-cli
+$ make 
+```
 
-## <h2 id="commands">Commands via CLI</h2>
-
-Once the client tool has been successfully built, running ./helium --help will provide a list of options, commands, and descriptions which are also shown below. The format for a CLI command is:
-  * "./helium [OPTIONS] [cmd [arg [arg ...]]]"
-
-  * Connect - Connect the Helium Atom to the network. Use -f to specify quick connect data from file. 
-    - "./helium -p <port> connect"
-  * Check connection - Check if the Atom is connected.
-    -  "./helium -p <port> connected" (returns 0 if connected)
-  * Sleep - Disconnect from the netork, saving quick connect data. 
-   - "./helium -p <port> sleep"
-  * Info - Print information of the Atom.
-    - "./helium -p <port> info"
-  * Reset - Reset the Atom.
-    - "./helium -p <port> reset"
-  * Create channel - Create a channel with a given name and prints the ID of the created channel.
-    - "./helium -p <port> channel create "Helium MQTT"" (prints channel ID if successful)
-  * Channel send - Sends the given text ("hello world!" format) to the channel specified in <id>. 
-    - "./helium -p <port> channel send <id> [text]"
-  * Channel poll - Poll the specified channel for all downlink data.
-    - "./helium -p <port> channel poll <id>"
-  * Channel ping - Ping the specified channel.
-    - "./helium -p <port> channel ping <id>"
-  * Channel config: 
-    1. Get - Get a channel configuration value for the given key.
-        - "./helium -p <port> channel config get <id> <key>"
-    2. Set - Set a configuration value for a given key. Values must be expressed as JSON null, numbers (such as int and float), booleans (true or false), and strings.
-        - "./helium -p <port> channel config set <id> <key> <value>"
-    3. Poll - Poll a channel configuration for a stale config indicator every 5 seconds. 
-        - "./helium -p <port> channel config poll <id>"
-
-  * Options:
-    1. -h/--help      This help message.
-    2. -p/--port      The (USB) device to talk to.
-    3. -b/--baud      The baud rate to use on the port (default 9600).
-    4. -f/--file      The file to use for connect/sleep data or channel send.
+3. Once this is complete, and your Atom is connected to your workstation via the USB Adapter, you can the test the connection by using the `info ` command and specifying the port you're connected. For example:
+ 
+```
+$ ./helium -p /dev/tty.usbserial-DN01IQCC info
+```
 
 
-## <h2 id="cli-examples">Helium-CLI example</h2>
+## <h2 id="commands">CLI Commands</h2>
 
-Simply, the Helium-CLI is a basic direct interface to the Atom. It allows the user to alter low level parameters and monitor activity. 
+Once the CLI has been successfully built, running `./helium --help` will provide a list of options, commands, and descriptions which are also shown below.  
 
-### Simple Use Case Example
+The format for a CLI command is:
+
+```
+$ ./helium [OPTIONS] [cmd [arg [arg ...]]]
+```
+
+### Top Level Commands
+
+**connect** - Connect the Helium Atom to the Helium Network. Use `-f` to specify quick connect data from file. 
+``` 
+$ ./helium -p <port> connect
+```
+
+**connected** - Check if the Atom is connected. This will return `0` if connected.
+``` 
+$ ./helium -p <port> connected
+```
+
+**sleep** - Disconnect from the netork, saving quick connect data. 
+``` 
+$ ./helium -p <port> sleep
+```
+
+**info** - Print the Atom's information. 
+``` 
+$ ./helium -p <port> info
+```
+
+**reset** - Reset the Atom.
+```
+$ ./helium -p <port> reset
+```
+
+**create channel** - Create a channel with a given name. If the Channel was created successfully, it prints the ID - a number between `1` and `255`.
+``` 
+$ ./helium -p <port> channel create "Helium MQTT"" 
+$ Channel created: 1
+``` 
+
+**channel send** - Sends the supplied text to the channel specified in the `id`. 
+``` 
+$ ./helium -p <port> channel send <id> [text]
+```
+
+**channel poll** - Poll the specified channel of a given `id` for all downlink data.
+```
+$ ./helium -p <port> channel poll <id>
+```
+
+**channel ping** - Ping the specified channel.
+```
+$ ./helium -p <port> channel ping <id>
+``` 
+
+**channel config** 
+
+There are three variations for the `channel config` command: `get`, `set`, and `poll`. 
+
+* `channel config get` - Get a channel configuration value for the given `id` and `key`.
+
+```
+$ ./helium -p <port> channel config get <id> <key>
+``` 
+
+* `channel config set` - Set a configuration value for a given key. Values must be expressed as JSON null, numbers (such as int and float), booleans (true or false), and strings.
+
+```
+$ ./helium -p <port> channel config set <id> <key> <value>
+```
+
+* `channel config poll` - Poll a channel configuration for a stale config indicator every 5 seconds. 
+
+``` 
+$ ./helium -p <port> channel config poll <id>
+```
+
+### CLI Command Options:
+
+The following options (or "flags") can all be passed with applicable commands from above:
+
+* `-h/--help` - This help message.
+* `-p/--port` - The (USB) device to talk to.
+* `-b/--baud` - The baud rate to use on the port (default 9600).
+* `-f/--file` - The file to use for connect/sleep data or channel send.
+
+
+## <h2 id="cli-examples">CLI Examples</h2>
 
 Here are a series of commands and responses for standard CLI interface use. This example will connect, check connection, create channel, and send a string.
 
-```bash
-./helium -p /dev/tty.usbserial-DN01IQCC connect
-./helium -p /dev/tty.usbserial-DN01IQCC connected
+```
+// Connect your Helium Atom to the Network via the "tty.usbserial-DN01IQCC" port 
+
+$ ./helium -p /dev/tty.usbserial-DN01IQCC connect
+```
+
+```
+// Check if you Helium Atom is connected to the Network while plugged into port "tty.usbserial-DN01IQCC" 
+
+$ ./helium -p /dev/tty.usbserial-DN01IQCC connected
+```
+
+```
+// Create a channel named "Helium MQTT" 
+
 $ ./helium -p /dev/tty.usbserial-DN01IQCC channel create "Helium MQTT"
-Channel created: 1
-./helium -p /dev/tty.usbserial-DN01IQCC channel send "hello world"
+$ Channel created: 1
+```
+
+```
+// Send the string "hello world" to the Helium MQTT Channel (which was given the ID "1" in the previous command).
+
+$ ./helium -p /dev/tty.usbserial-DN01IQCC channel send 1 "hello world"
 ```
 
 ---
 
-## <h2 id="further-reading">Further Reading</h2=>
+## <h2 id="further-reading">Further Reading and Support</h2>
 
-**GitHub Source** 
-
-* [Helium-CLI Repository](https://github.com/helium/helium-cli)
-
-**USB Interface Hardware** 
-
-* [Sparkfun XBee Dongle](https://www.sparkfun.com/products/11697) 
-
-
+* [Helium Developer Documenation](https://helium.com/dev)
+* [Helium Developer Forum](https://forum.helium.com)
+* [Heilum Developer Slack](http://chat.helium.com)
+* [Buy Helium Hardware](http://helium.com/store)
