@@ -1,3 +1,8 @@
+# Deprecated #
+
+This repository is for a previous version of the Helium platform and is no longer being maintained. Please see  [Helium](https://helium.com) for information and updates on the latest product and related SDKs. 
+
+
 # The Helium Command Line Interface (CLI)
 
 The Helium CLI enables USB-connected [Helium Atoms](https://www.helium.com/dev/architecture/overview#atom-module) to connect, send data to, and receive data from the Helium network via the command line. This document covers the setup of the `helium-cli` tool, its basic funtionality, and demonstrated use.
